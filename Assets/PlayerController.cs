@@ -19,6 +19,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     LayerMask groundLayer;
 
+    [SerializeField]
+    LayerMask enemyLayer;
+
     bool mayJump = true;
 
 
@@ -36,6 +39,9 @@ public class PlayerController : MonoBehaviour
         transform.Translate(movementX * speed * Time.deltaTime);
 
         bool isGrounded = Physics2D.OverlapBox(groundCheck.position, MakeGroundcheckSize(), 0, groundLayer);
+        if(!isGrounded){
+            isGrounded = Physics2D.OverlapBox(groundCheck.position, MakeGroundcheckSize(), 0, enemyLayer);
+        }
 
         if (Input.GetAxisRaw("Jump") > 0 && mayJump == true && isGrounded == true)
         {
@@ -54,6 +60,15 @@ public class PlayerController : MonoBehaviour
 
 
     }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer == 6)
+        {
+            Debug.Log("Hit");
+        }
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
