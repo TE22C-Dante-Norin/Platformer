@@ -22,6 +22,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     LayerMask enemyLayer;
 
+    [SerializeField]
+    LayerMask ladderLayer;
+
+    [SerializeField]
+    SpriteRenderer hobbeSprite;
+
     bool mayJump = true;
 
 
@@ -35,11 +41,37 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         float moveX = Input.GetAxisRaw("Horizontal");
+        if (moveX > 0f)
+        {
+            hobbeSprite.flipX = false;
+        }
+        else if (moveX < 0f)
+        {
+            hobbeSprite.flipX = true;
+        }
+
+
         Vector2 movementX = new Vector2(moveX, 0);
         transform.Translate(movementX * speed * Time.deltaTime);
 
+        bool isClimbing = Physics2D.OverlapCircle(gameObject.transform.position, 0.4f, ladderLayer);
+        if (isClimbing == true)
+        {
+            float moveY = Input.GetAxisRaw("Vertical");
+            Vector2 movementY = new Vector2(0, moveY);
+            transform.Translate(movementY * speed * Time.deltaTime);
+            gameObject.GetComponent<Rigidbody2D>().simulated = false;
+
+        }
+        else
+        {
+
+            gameObject.GetComponent<Rigidbody2D>().simulated = true;
+        }
+
         bool isGrounded = Physics2D.OverlapBox(groundCheck.position, MakeGroundcheckSize(), 0, groundLayer);
-        if(!isGrounded){
+        if (!isGrounded)
+        {
             isGrounded = Physics2D.OverlapBox(groundCheck.position, MakeGroundcheckSize(), 0, enemyLayer);
         }
 
@@ -73,6 +105,7 @@ public class PlayerController : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(groundCheck.position, MakeGroundcheckSize());
+        Gizmos.DrawWireSphere(gameObject.transform.position, 0.4f);
     }
 
     private Vector3 MakeGroundcheckSize() => new Vector3(1, groundRadius);
