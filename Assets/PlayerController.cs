@@ -52,7 +52,6 @@ public class PlayerController : MonoBehaviour
         float moveX = Input.GetAxisRaw("Horizontal");
         Vector2 movementX = new Vector2(moveX, 0);
         transform.Translate(movementX * speed * Time.deltaTime);
-        animator.SetFloat("Horizontal", moveX);
         if (moveX > 0f)
         {
             animator.Play("WalkLeft");
