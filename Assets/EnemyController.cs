@@ -38,4 +38,8 @@ public class EnemyController : MonoBehaviour
             }
         }
     }
+
+    public void Killed(){
+        Destroy(this.gameObject);
+    }
 }

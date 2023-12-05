@@ -32,7 +32,13 @@ public class PlayerController : MonoBehaviour
     int jumpMax;
     int jumpCount;
 
+    [SerializeField]
+    GameObject hitLeft;
+    [SerializeField]
+    GameObject hitRight;
+
     bool mayJump = true;
+    bool mayAttack = true;
 
 
     [SerializeField]
@@ -62,12 +68,17 @@ public class PlayerController : MonoBehaviour
             animator.Play("WalkLeft");
             hobbeSprite.flipX = false;
         }
-        else{
-            animator.Play("Standing");  
+        else
+        {
+            if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Hit"))
+            {
+                animator.Play("Standing");
+            }
         }
 
 
-        
+
+
 
         bool isClimbing = Physics2D.OverlapCircle(gameObject.transform.position, 0.4f, ladderLayer);
         if (isClimbing == true)
@@ -111,6 +122,37 @@ public class PlayerController : MonoBehaviour
         }
 
 
+        if (Input.GetKeyDown("e") && mayAttack == true)
+        {
+            hobbeSprite.flipX = true;
+            mayAttack = false;
+            Attack(hitRight);
+            animator.Play("Hit");
+        }
+
+        if (Input.GetKeyDown("q") && mayAttack == true)
+        {
+            hobbeSprite.flipX = false;
+            mayAttack = false;
+            Attack(hitLeft);
+            animator.Play("Hit");
+        }
+
+        if (!Input.GetKeyDown("e") && !Input.GetKeyDown("q"))
+        {
+            mayAttack = true;
+        }
+
+    }
+
+    void Attack(GameObject direction)
+    {
+        Collider2D[] HitEnemies = Physics2D.OverlapCircleAll(direction.transform.position, 0.4f, enemyLayer);
+        foreach (Collider2D enemy in HitEnemies)
+        {
+            enemy.GetComponent<EnemyController>().Killed();
+            Debug.Log("hittad");
+        }
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -126,6 +168,8 @@ public class PlayerController : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(groundCheck.position, MakeGroundcheckSize());
         Gizmos.DrawWireSphere(gameObject.transform.position, 0.4f);
+        Gizmos.DrawWireSphere(hitLeft.transform.position, 0.3f);
+        Gizmos.DrawWireSphere(hitRight.transform.position, 0.3f);
     }
 
     private Vector3 MakeGroundcheckSize() => new Vector3(1, groundRadius);
