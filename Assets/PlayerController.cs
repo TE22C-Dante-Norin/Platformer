@@ -44,6 +44,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     Animator animator;
 
+    [SerializeField]
+    GameObject healthbar;
+    [SerializeField]
+    float healthMax;
+    float healthCurrent;
+
 
     // Start is called before the first frame update
     void Start()
@@ -91,7 +97,6 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-
             gameObject.GetComponent<Rigidbody2D>().simulated = true;
         }
 
@@ -151,7 +156,7 @@ public class PlayerController : MonoBehaviour
         foreach (Collider2D enemy in HitEnemies)
         {
             enemy.GetComponent<EnemyController>().Killed();
-            Debug.Log("hittad");
+            
         }
     }
 
