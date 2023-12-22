@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -45,7 +46,7 @@ public class PlayerController : MonoBehaviour
     Animator animator;
 
     [SerializeField]
-    GameObject healthbar;
+    Slider healthbar;
     [SerializeField]
     float healthMax;
     float healthCurrent;
@@ -54,12 +55,15 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        healthCurrent = healthMax;
         animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
+
+        healthbar.value = healthCurrent;
 
         float moveX = Input.GetAxisRaw("Horizontal");
         Vector2 movementX = new Vector2(moveX, 0);
@@ -164,7 +168,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.layer == 6)
         {
-            Debug.Log("Hit");
+            healthCurrent -= 20;
         }
     }
 
