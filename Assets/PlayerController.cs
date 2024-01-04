@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,6 +34,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     int jumpMax;
     int jumpCount;
+    [SerializeField]
+    TMP_Text jumpCountText;
+
 
     [SerializeField]
     GameObject hitLeft;
@@ -57,11 +62,21 @@ public class PlayerController : MonoBehaviour
     {
         healthCurrent = healthMax;
         animator = GetComponent<Animator>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (healthCurrent > healthMax)
+        {
+            healthCurrent = healthMax;
+        }
+
+        if (healthCurrent <= 0)
+        {
+            Destroy(this.gameObject);
+        }
 
         healthbar.value = healthCurrent;
 
@@ -87,8 +102,7 @@ public class PlayerController : MonoBehaviour
         }
 
 
-
-
+        jumpCountText.text = $"Jumps left: {jumpCount}";
 
         bool isClimbing = Physics2D.OverlapCircle(gameObject.transform.position, 0.4f, ladderLayer);
         if (isClimbing == true)
@@ -109,20 +123,14 @@ public class PlayerController : MonoBehaviour
         {
             isGrounded = Physics2D.OverlapBox(groundCheck.position, MakeGroundcheckSize(), 0, enemyLayer);
         }
-        else
+        else if (mayJump)
         {
             jumpCount = jumpMax;
         }
 
         if (Input.GetAxisRaw("Jump") > 0 && mayJump == true && jumpCount > 0)
         {
-            Rigidbody2D rb = GetComponent<Rigidbody2D>();
-            Vector2 jump = Vector2.up * jumpForce;
-            rb.AddForce(jump);
-
-            jumpCount--;
-            mayJump = false;
-
+            Jump();
         }
 
         if (Input.GetAxisRaw("Jump") == 0)
@@ -146,6 +154,10 @@ public class PlayerController : MonoBehaviour
             Attack(hitLeft);
             animator.Play("Hit");
         }
+        if (Input.GetKeyDown("h"))
+        {
+            GetComponent<TextMeshPro>().text = "333";
+        }
 
         if (!Input.GetKeyDown("e") && !Input.GetKeyDown("q"))
         {
@@ -154,13 +166,23 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    void Jump()
+    {
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        Vector2 jump = Vector2.up * jumpForce;
+        Vector2 tempVector = new Vector2(0, 0);
+        rb.velocity = tempVector;
+        rb.AddForce(jump);
+        jumpCount--;
+        mayJump = false;
+    }
     void Attack(GameObject direction)
     {
         Collider2D[] HitEnemies = Physics2D.OverlapCircleAll(direction.transform.position, 0.4f, enemyLayer);
         foreach (Collider2D enemy in HitEnemies)
         {
             enemy.GetComponent<EnemyController>().Killed();
-            
+
         }
     }
 
@@ -170,6 +192,24 @@ public class PlayerController : MonoBehaviour
         {
             healthCurrent -= 20;
         }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.layer == 8)
+        {
+            other.gameObject.GetComponent<PowerupScript>().PickUp(gameObject);
+        }
+    }
+
+    public void Heart()
+    {
+        healthCurrent += 20;
+    }
+    public void ExtraJump()
+    {
+        jumpMax++;
+        jumpCount = jumpMax;
     }
 
     private void OnDrawGizmos()
