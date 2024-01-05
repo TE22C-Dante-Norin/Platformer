@@ -154,10 +154,6 @@ public class PlayerController : MonoBehaviour
             Attack(hitLeft);
             animator.Play("Hit");
         }
-        if (Input.GetKeyDown("h"))
-        {
-            GetComponent<TextMeshPro>().text = "333";
-        }
 
         if (!Input.GetKeyDown("e") && !Input.GetKeyDown("q"))
         {
